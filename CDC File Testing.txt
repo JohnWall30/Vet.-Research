@@ -1,0 +1,66 @@
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_excel('veteran_suicides_age.xlsx')
+
+df.describe()
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def test_run():
+    df[['vet_rate','civ_rate']].plot()
+    plt.show()
+if __name__=='__main__':
+    test_run()
+
+info = df.groupby('vet_rate')['civ_rate'].mean()
+
+info.head()
+
+fig, ax = plt.subplots()
+my_scatter_plot = ax.scatter(df["vet_rate"], df["civ_rate"])
+
+plt.show()
+
+
+capitals = pd.read_csv('statelatlong.csv',index_col=0)
+
+capitals.head()
+
+
+capitals
+
+capitals.plot.scatter(x='Longitude',y='Latitude')
+
+from IPython.core.display import Image
+Image(filename =('satellite-image-of-the-united-states-of-america.jpg'))
+
+import matplotlib.pyplot as plt
+im = plt.imread('satellite-image-of-the-united-states-of-america.jpg')
+capitals.plot.scatter(x='Longitude',y='Latitude',c='r')
+plt.show()
+
+implot = plt.imshow(im)
+
+
+import geopandas
+import matplotlib
+orig = matplotlib.rcParams['figure.figsize']
+matplotlib.rcParams['figure.figsize'] = [orig[0] * 1.5, orig[1]]
+import matplotlib.pyplot as plt
+plt.close('all')
+
+
+world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+#capitals = geopandas.read_file(geopandas.datasets.get_path('naturalearth_cities'))
+world
+
+
+countries = world[world['name'] == "United States"]
+countries = countries[['geometry', 'name']]
+countries = countries.to_crs('+init=epsg:3395')
+
+
+countries.plot();
