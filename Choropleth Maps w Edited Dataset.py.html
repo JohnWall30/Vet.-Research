@@ -1,0 +1,539 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+
+import geopandas as gpd
+shapefile = 'states.shp'
+#Read shapefile using Geopandas
+gdf = gpd.read_file(shapefile)
+gdf.head()
+
+
+# In[2]:
+
+
+import pandas as pd
+
+dataFile = 'VeteranCombinedDataSheet.xlsx'
+veteransData =pd.read_excel(dataFile, names = ['state','Year','Latitude','Longitude','vet_pop','overall_pop_18','vet_pop_p','vet_suicides','all_suicides','vet_suicides_p','vet_males','vet_males_p','vet_females','vet_females_p','vet_15_24','vet_18_29','vet_17_34','vet_25_34','vet_30_39','vet_25_44','vet_35_44','vet_40_49','vet_35-54','vet_45_54','vet_50_59','vet_45_64','vet_55_64','vet_60','vet_65','vet_rate','civ_rate'], skiprows = 1)
+veteransData.head()
+
+
+# In[3]:
+
+
+print(veteransData[veteransData['state']=='Hawaii'])
+
+
+# In[4]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2005]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+
+
+# In[5]:
+
+
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+
+
+# In[6]:
+
+
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+
+
+# In[28]:
+
+
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2005', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+
+
+# In[47]:
+
+
+# Import savings function
+from bokeh.io import export_png
+
+export_png(p, filename="plot.png")
+show(p)
+
+
+# In[9]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2006]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+
+
+# In[10]:
+
+
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+
+
+# In[11]:
+
+
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+
+
+# In[35]:
+
+
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2006', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+from bokeh.io import output_file
+# Specify the output file and save
+output_file('2006.html')
+show(p)
+
+
+# In[36]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2007]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2007', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+from bokeh.io import output_file
+# Specify the output file and save
+output_file('2007.html')
+show(p)
+
+
+# In[37]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2008]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2008', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+from bokeh.io import output_file
+# Specify the output file and save
+output_file('2008.html')
+show(p)
+
+
+# In[38]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2010]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2010', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+from bokeh.io import output_file
+# Specify the output file and save
+output_file('2010.html')
+show(p)
+
+
+# In[39]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2011]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2011', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+from bokeh.io import output_file
+# Specify the output file and save
+output_file('2011.html')
+show(p)
+
+
+# In[44]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2009]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data 2009', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+export_png(p,filename)
+show(p)
+
+
+# In[17]:
+
+
+from bokeh.io import curdoc, output_notebook
+from bokeh.models import Slider, HoverTool
+from bokeh.layouts import widgetbox, row, column
+#Define function that returns json_data for year selected by user.
+    
+def json_data(selectedYear):
+    yr = selectedYear
+    df_yr = all_sheets_veteransData[all_sheets_veteransData['Year'] == yr]
+    merged = gdf.merge(df_yr, left_on = 'state', right_on = 'state')
+    merged.fillna('No data', inplace = True)
+    merged_json = json.loads(merged.to_json())
+    json_data = json.dumps(merged_json)
+    return json_data
+
+#Add hover tool
+hover = HoverTool(tooltips = [ ('State','@state'),('Veteran Suicide Percentage', '@vet_suicides_p')])
+
+
+# In[18]:
+
+
+#Filter data for year 2005.
+dataSet2005 = veteransData[veteransData['Year'] == 2009]
+#Merge dataframes gdf and df_2016.
+
+merged = gdf.merge(dataSet2005, left_on = 'state', right_on = 'state',how = 'left')
+merged.fillna('No data', inplace = True)
+import json
+#Read data to json.
+merged_json = json.loads(merged.to_json())
+#Convert to String like object.
+json_data = json.dumps(merged_json)
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.palettes import brewer
+
+geosource = GeoJSONDataSource(geojson = json_data)
+
+palette = brewer['YlOrRd'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of color
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+color_mapper = LinearColorMapper(palette = palette, low = .10, high = .30)
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '5': '5%', '10':'10%', '15':'15%', '20':'20%', '25':'25%', '30':'30%','35':'35%', '40': '>40%'}
+#Create color bar. 
+color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
+border_line_color=None,location = (0,0), orientation = 'horizontal', major_label_overrides = tick_labels)
+#Create figure object.
+p = figure(title = 'Veterans Data', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+output_notebook()
+show(p)
+
+
+# In[19]:
+
+
+#Create figure object.
+p = figure(title = 'Veterans Data From 2005-2011', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.xgrid.grid_line_color = None
+p.ygrid.grid_line_color = None
+
+#Add patch renderer to figure. 
+p.patches('xs','ys', source = geosource,fill_color = {'field' :'vet_suicides_p', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+#Specify figure layout.
+p.add_layout(color_bar, 'below')
+#Display figure inline in Jupyter Notebook.
+
+
+
+# In[20]:
+
+
+#Input GeoJSON source that contains features for plotting.
+#geosource = GeoJSONDataSource(geojson = json_data(2016))
+#Define a sequential multi-hue color palette.
+palette = brewer['RdPu'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+#Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors. Input nan_color.
+color_mapper = LinearColorMapper(palette = palette, low = .15, high = .30, nan_color = '#fde0dd')
+#Define custom tick labels for color bar.
+tick_labels = {'0': '0%', '.5': '5%', '.10':'10%','.15':'15%', '.20':'20%','.25':'25%','.30':'>30%'}
+
+
+# In[21]:
+
+
+#Specify layout
+p.add_layout(color_bar, 'below')
+# Define the callback function: update_plot
+def update_plot(attr, old, new):
+    yr = slider.value
+    new_data = json_data(yr)
+    geosource.geojson = new_data
+    p.title.text = 'Deaths due to suicide, %d' %yr
+    
+# Make a slider object: slider 
+slider = Slider(title = 'Year',start = 2005, end = 2011, step = 1, value = 2011)
+slider.on_change('value', update_plot)
+# Make a column layout of widgetbox(slider) and plot, and add it to the current document
+layout = column(p,widgetbox(slider))
+curdoc().add_root(layout)
+#Display plot inline in Jupyter notebook
+output_notebook()
+#Display plot
+
+
+# In[22]:
+
+
+show(layout)
+
+
+# In[ ]:
+
+
+
+
